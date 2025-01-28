@@ -8,7 +8,7 @@ from simple_salesforce import Salesforce
 from tabulate import tabulate
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)  # Added override=True to ensure we get the latest values
 
 # Create a Modal app
 app = modal.App("salesforce-account-updater")
@@ -56,7 +56,8 @@ def get_top_companies():
                     "product_tour_company_metrics.total_visitors",
                     "product_tour_company_metrics.first_product_tour_date",
                     "product_tour_company_metrics.last_product_tour_date",
-                    "product_tour_company_metrics.total_session_time_minutes"
+                    "product_tour_company_metrics.total_session_time_minutes",
+                    "product_tour_company_metrics.total_sessions"
                 ],
                 "filters": [
                     {
@@ -88,7 +89,7 @@ def get_top_companies():
             for row in data.get("data", []):
                 company_data = {
                     'name': row.get('product_tour_company_metrics.company_name'),
-                    'sessions': row.get('product_tour_company_metrics.total_sessions'),
+                    'sessions': row.get('product_tour_company_metrics.total_sessions', 0),  # Default to 0 if not found
                     'visitors': row.get('product_tour_company_metrics.total_visitors'),
                     'first_tour_date': row.get('product_tour_company_metrics.first_product_tour_date'),
                     'last_tour_date': row.get('product_tour_company_metrics.last_product_tour_date'),
